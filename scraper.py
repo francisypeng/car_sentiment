@@ -124,7 +124,7 @@ def get_basic_df(driver):
     
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
     auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
-    auction_title = auction_title_obj.find_element(By.XPATH, '/h1')
+    auction_title = auction_title_obj.find_element(By.XPATH, '/h1').text
     subtitle = auction_heading.find_element(By.XPATH, '//div/div[2]/h2').text # get subtitle
     try: # get reserve 1 or 0
         reserve_text = auction_heading.find_element(By.CLASS_NAME, 'no-reserve')
