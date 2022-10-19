@@ -56,15 +56,52 @@ def load_and_scroll(driver):
             time.sleep(3)
     return None
 
-def get_comments(driver):
+def get_thread_df(driver):
+    # Get comment section
+    try:
+        main = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "comments"))
+        )
+    except:
+        print("Could not find comment section, quitting.")
+        driver.quit()
 
-    return None
+    # get comment thread
+    thread = main.find_element(By.CLASS_NAME, 'thread')
+    # get each element. could be comment, flagged comment, bid, etc.
+    comments = thread.find_elements(By.XPATH, '*')
+    # print user of each comment
+    thread_df = pd.DataFrame(columns = ['position', 'user', 'comment', 'bid'])
+    position = 1
+    for comment in comments:
+        # get username
+        try:
+            username = comment.find_element(By.CLASS_NAME, 'user').text
+        except:
+            username = None
+        # get message
+        try: 
+            message = comment.find_element(By.CLASS_NAME, 'message').text
+        except:
+            message = None
+        # get bid
+        try:
+            bid = comment.find_element(By.CLASS_NAME, 'bid-value').text
+        except:
+            bid = None
+        
+        thread_df.loc[len(thread_df.index)] = [position, username, message, bid] 
+        position += 1    
+    
+    return thread_df
 
 
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
     load_and_scroll(driver)
+    thread_df = get_thread_df(driver)
+    thread_df.to_csv('testdf.csv')
 
 
 
