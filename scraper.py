@@ -124,7 +124,7 @@ def get_basic_df(driver):
     
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
     auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
-    auction_title = auction_title_obj.find_element(By.XPATH, '/h1').text
+    auction_title = auction_title_obj.find_element(By.XPATH, '//h1').text
     subtitle = auction_heading.find_element(By.XPATH, '//div/div[2]/h2').text # get subtitle
     try: # get reserve 1 or 0
         reserve_text = auction_heading.find_element(By.CLASS_NAME, 'no-reserve')
@@ -167,7 +167,8 @@ def get_basic_df(driver):
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window()
-    driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
+    driver.get("https://carsandbids.com/auctions/rbqYD88Q/2022-rivian-r1t-adventure")
+    #driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
     load_and_scroll(driver)
     #thread_df = get_thread_df(driver)
     #thread_df.to_csv('testdf.csv')
