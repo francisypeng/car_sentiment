@@ -118,19 +118,14 @@ def get_basic_df(driver):
     make, model, year, milage, VIN, title status, location, engine, drivetrain, transmission, 
     body style, exterior color, interior color, seller type
     """
-    df = pd.DataFrame(columns = ['title,' 'subtitle', 'reserve', 'num_bids', 'num_com', 'end_bid', 'end_date', 'num_photos',
+    df = pd.DataFrame(columns = ['title', 'subtitle', 'reserve', 'num_bids', 'num_com', 'end_bid', 'end_date', 'num_photos',
                                 'make', 'model', 'milage', 'VIN', 'title', 'location', 'seller', 'engine', 'drivetrain', 'transmission',
                                 'body_style', 'e_color', 'i_color', 'seller_type'])
-    try:
-        auction_heading = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'row auction-heading'))
-        )
-    except:
-        print("Could not find auction heading, quitting.")
-        driver.quit()
-
-    title = auction_heading.find_element(By.CLASS_NAME, 'auction-title').text # get title
-    subtitle = auction_heading.find_element(By.CLASS_NAME, 'd-md-flex justify-content-between flex-wrap').text # get subtitle
+    
+    auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
+    auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
+    auction_title = auction_title_obj.find_element(By.XPATH, '/h1')
+    subtitle = auction_heading.find_element(By.XPATH, '//div/div[2]/h2').text # get subtitle
     try: # get reserve 1 or 0
         reserve_text = auction_heading.find_element(By.CLASS_NAME, 'no-reserve')
     except:
@@ -144,8 +139,8 @@ def get_basic_df(driver):
     end_bid = bid_stats.find_element(By.CLASS_NAME, 'ended').find_element(By.CLASS_NAME, 'bid-value').text
     end_date = bid_stats.find_element(By.CLASS_NAME, 'time').find_element(By.CLASS_NAME, 'time-ended').text
 
-    photos = driver.find_element(By.CLASS_NAME, 'row auction-photos')
-    num_photos = photos.find_element(By.CLASS_NAME, 'group interior').find_element(By.CLASS_NAME, 'all').text
+    photos = driver.find_element(By.CLASS_NAME, 'gallery-preview')
+    num_photos = photos.find_element(By.CLASS_NAME, 'images').find_element(By.CLASS_NAME, 'all').text
 
     quick_facts = driver.find_element(By.CLASS_NAME, 'quick-facts')
     make = quick_facts.find_element(By.XPATH, '//dl/dd[1]').text
@@ -154,16 +149,16 @@ def get_basic_df(driver):
     vin = quick_facts.find_element(By.XPATH, '//dl/dd[4]').text
     title = quick_facts.find_element(By.XPATH, '//dl/dd[5]').text
     location = quick_facts.find_element(By.XPATH, '//dl/dd[6]').text
-    seller = quick_facts.find_element(By.XPATH, '//dl/dd[7]').find_element(By.CLASS_NAME, 'user')
+    seller = quick_facts.find_element(By.XPATH, '//dl/dd[7]').find_element(By.CLASS_NAME, 'user').text
     engine = quick_facts.find_element(By.XPATH, '//dl[2]/dd[1]').text
     drivetrain = quick_facts.find_element(By.XPATH, '//dl[2]/dd[2]').text
     transmission = quick_facts.find_element(By.XPATH, '//dl[2]/dd[3]').text
     body_style = quick_facts.find_element(By.XPATH, '//dl[2]/dd[4]').text
     e_color = quick_facts.find_element(By.XPATH, '//dl[2]/dd[5]').text
     i_color = quick_facts.find_element(By.XPATH, '//dl[2]/dd[6]').text
-    seller_type = quick_facts.find_element(By.XPATH, '//dl[2]/dd[7]').find_element(By.CLASS_NAME, 'user')
+    seller_type = quick_facts.find_element(By.XPATH, '//dl[2]/dd[7]').text
 
-    df.loc[len(df.index)] = [title, subtitle, reserve, num_bids, num_com, end_bid, end_date, num_photos, make, model, milage, vin, title, location, seller,
+    df.loc[len(df.index)] = [auction_title, subtitle, reserve, num_bids, num_com, end_bid, end_date, num_photos, make, model, milage, vin, title, location, seller,
                             engine, drivetrain, transmission, body_style, e_color, i_color, seller_type] 
 
     return df
@@ -171,6 +166,7 @@ def get_basic_df(driver):
 
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
+    driver.maximize_window()
     driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
     load_and_scroll(driver)
     #thread_df = get_thread_df(driver)
