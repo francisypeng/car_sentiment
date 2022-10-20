@@ -136,7 +136,7 @@ def get_basic_df(driver):
     bid_stats = driver.find_element(By.CLASS_NAME, 'bid-stats')
     num_bids = bid_stats.find_element(By.CLASS_NAME, 'num-bids').find_element(By.CLASS_NAME, 'value').text
     num_com = bid_stats.find_element(By.CLASS_NAME, 'num-comments').find_element(By.CLASS_NAME, 'value').text
-    end_bid = bid_stats.find_element(By.CLASS_NAME, 'ended').find_element(By.CLASS_NAME, 'bid-value').text
+    end_bid = bid_stats.find_element(By.CLASS_NAME, 'ended').find_element(By.CLASS_NAME, 'value').text
     end_date = bid_stats.find_element(By.CLASS_NAME, 'time').find_element(By.CLASS_NAME, 'time-ended').text
 
     photos = driver.find_element(By.CLASS_NAME, 'gallery-preview')
@@ -167,12 +167,28 @@ def get_basic_df(driver):
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window()
-    driver.get("https://carsandbids.com/auctions/rbqYD88Q/2022-rivian-r1t-adventure")
+    driver.get('https://carsandbids.com/past-auctions/')
+    #driver.get("https://carsandbids.com/auctions/rbqYD88Q/2022-rivian-r1t-adventure")
+    basic_df = pd.DataFrame()
+    for i in range(1, 51):
+        time.sleep(3)
+        xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a'
+        auction = driver.find_element(By.XPATH, xpath)
+        auction.click()
+        time.sleep(3)
+        load_and_scroll(driver)
+        basic_df_i = get_basic_df(driver)
+        basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True)
+        thread_df = get_thread_df(driver)
+        thread_df.to_csv('thread_df' + str(i) + '.csv')
+        driver.back()
+
+        
     #driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
-    load_and_scroll(driver)
+    
     #thread_df = get_thread_df(driver)
     #thread_df.to_csv('testdf.csv')
-    basic_df = get_basic_df(driver)
+    # basic_df = get_basic_df(driver)
     basic_df.to_csv('basicdf.csv')
 
     driver.quit()
