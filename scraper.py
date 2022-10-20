@@ -97,7 +97,7 @@ def get_thread_df(driver):
         try:
             rep = comment.find_element(By.CLASS_NAME, 'rep').text
         except:
-            bid = None
+            rep = None
         # get seller?
         try:
             get_seller = comment.find_element(By.CLASS_NAME, 'seller')
