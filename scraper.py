@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 page = requests.get("https://carsandbids.com/auctions/3qbOzbzy/2004-porsche-911-gt3")
@@ -170,12 +171,13 @@ def main():
     driver.get('https://carsandbids.com/past-auctions/')
     #driver.get("https://carsandbids.com/auctions/rbqYD88Q/2022-rivian-r1t-adventure")
     basic_df = pd.DataFrame()
-    for i in range(1, 51):
+    for i in range(1, 6):
         time.sleep(2)
+        #       //*[@id="root"]/div[2]/div[2]/div/ul[1]/li[1]/div[2]/div/a
         xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a'
         auction = driver.find_element(By.XPATH, xpath)
-        driver.execute_script("arguments[0].scrollIntoView();", auction)
-        auction.click()
+        action = ActionChains(driver)
+        action.move_to_element(auction).click().perform()
         load_and_scroll(driver)
         basic_df_i = get_basic_df(driver)
         basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True)
