@@ -119,10 +119,12 @@ def get_basic_df(driver):
     make, model, year, milage, VIN, title status, location, engine, drivetrain, transmission, 
     body style, exterior color, interior color, seller type
     """
+    ### INIT DF ###
     df = pd.DataFrame(columns = ['title', 'subtitle', 'reserve', 'num_bids', 'num_com', 'end_bid', 'end_date', 'num_photos',
                                 'make', 'model', 'milage', 'VIN', 'title', 'location', 'seller', 'engine', 'drivetrain', 'transmission',
                                 'body_style', 'e_color', 'i_color', 'seller_type'])
     
+    ### TITLE, SUBTITLE, RESERVE Y/N ###
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
     auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
     auction_title = auction_title_obj.find_element(By.XPATH, '//h1').text
@@ -133,16 +135,19 @@ def get_basic_df(driver):
         reserve = 1
     else:
         reserve = 0
-    
+
+    ### BID STATS: # bids, # comments, $ final bid, end date ###
     bid_stats = driver.find_element(By.CLASS_NAME, 'bid-stats')
     num_bids = bid_stats.find_element(By.CLASS_NAME, 'num-bids').find_element(By.CLASS_NAME, 'value').text
     num_com = bid_stats.find_element(By.CLASS_NAME, 'num-comments').find_element(By.CLASS_NAME, 'value').text
     end_bid = bid_stats.find_element(By.CLASS_NAME, 'ended').find_element(By.CLASS_NAME, 'value').text
     end_date = bid_stats.find_element(By.CLASS_NAME, 'time').find_element(By.CLASS_NAME, 'time-ended').text
 
+    ### NUMBER OF PHOTOS ###
     photos = driver.find_element(By.CLASS_NAME, 'gallery-preview')
     num_photos = photos.find_element(By.CLASS_NAME, 'images').find_element(By.CLASS_NAME, 'all').text
 
+    ### QUICK FACTS TABLE ###
     quick_facts = driver.find_element(By.CLASS_NAME, 'quick-facts')
     make = quick_facts.find_element(By.XPATH, '//dl/dd[1]').text
     model = quick_facts.find_element(By.XPATH, '//dl/dd[2]/a').text
@@ -167,33 +172,27 @@ def get_basic_df(driver):
 
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
-    driver.maximize_window()
-    driver.get('https://carsandbids.com/past-auctions/')
-    #driver.get("https://carsandbids.com/auctions/rbqYD88Q/2022-rivian-r1t-adventure")
-    basic_df = pd.DataFrame()
-    for i in range(1, 6):
+    driver.maximize_window() # maximize window for consistency
+    driver.get('https://carsandbids.com/past-auctions/') # auction listings
+    basic_df = pd.DataFrame() # initialize df
+    for i in range(1, 51):
         time.sleep(2)
-        #       //*[@id="root"]/div[2]/div[2]/div/ul[1]/li[1]/div[2]/div/a
-        xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a'
-        auction = driver.find_element(By.XPATH, xpath)
-        action = ActionChains(driver)
-        action.move_to_element(auction).click().perform()
-        load_and_scroll(driver)
-        basic_df_i = get_basic_df(driver)
-        basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True)
-        thread_df = get_thread_df(driver)
-        thread_df.to_csv('thread_df' + str(i) + '.csv')
-        driver.back()
+        xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
+        auction = driver.find_element(By.XPATH, xpath) # find auction element
 
-        
-    #driver.get("https://carsandbids.com/auctions/rxV7kL4j/2002-porsche-911-carrera-coupe") # get webpage
-    
-    #thread_df = get_thread_df(driver)
-    #thread_df.to_csv('testdf.csv')
-    # basic_df = get_basic_df(driver)
-    basic_df.to_csv('basicdf.csv')
+        action = ActionChains(driver) # initialize action chains driver for scroll to element and click
+        action.move_to_element(auction).click().perform() # scroll to element and click
 
-    driver.quit()
+        load_and_scroll(driver) # scroll and load entire page
+        basic_df_i = get_basic_df(driver) # get basic df
+        basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
+        thread_df = get_thread_df(driver) # get comment thread
+        thread_df.to_csv('thread_df' + str(i) + '.csv') # save thread df
+        driver.back() # back to auction listings
+
+    basic_df.to_csv('basicdf.csv') # save basic df
+
+    driver.quit() # quit driver
 
 
 if __name__ == '__main__':
