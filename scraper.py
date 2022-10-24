@@ -1,20 +1,14 @@
 import pandas as pd
 import numpy as np
-import xmltodict
-import requests
-from requests_html import HTMLSession
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-
-page = requests.get("https://carsandbids.com/auctions/3qbOzbzy/2004-porsche-911-gt3")
-page.status_code
 
 def load_and_scroll(driver):
     """
@@ -173,24 +167,25 @@ def get_basic_df(driver):
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window() # maximize window for consistency
-    driver.get('https://carsandbids.com/past-auctions/') # auction listings
-    basic_df = pd.DataFrame() # initialize df
-    for i in range(1, 51):
-        time.sleep(2)
-        xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
-        auction = driver.find_element(By.XPATH, xpath) # find auction element
+    for j in range(1, 193):
+        driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
+        basic_df = pd.DataFrame() # initialize df
+        for i in range(1, 51):
+            time.sleep(2)
+            xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
+            auction = driver.find_element(By.XPATH, xpath) # find auction element
 
-        action = ActionChains(driver) # initialize action chains driver for scroll to element and click
-        action.move_to_element(auction).click().perform() # scroll to element and click
+            action = ActionChains(driver) # initialize action chains driver for scroll to element and click
+            action.move_to_element(auction).click().perform() # scroll to element and click
 
-        load_and_scroll(driver) # scroll and load entire page
-        basic_df_i = get_basic_df(driver) # get basic df
-        basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
-        thread_df = get_thread_df(driver) # get comment thread
-        thread_df.to_csv('thread_df' + str(i) + '.csv') # save thread df
-        driver.back() # back to auction listings
+            load_and_scroll(driver) # scroll and load entire page
+            basic_df_i = get_basic_df(driver) # get basic df
+            basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
+            thread_df = get_thread_df(driver) # get comment thread
+            thread_df.to_csv('thread_df_' + str(i) + '.csv') # save thread df
+            driver.back() # back to auction listings
 
-    basic_df.to_csv('basicdf.csv') # save basic df
+        basic_df.to_csv('basic_df_' + str(j) + '.csv') # save basic df
 
     driver.quit() # quit driver
 
