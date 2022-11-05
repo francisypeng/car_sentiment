@@ -52,7 +52,7 @@ def load_and_scroll(driver):
                     match=True
     return None
 
-def get_thread_df(driver):
+def get_thread_df(driver, id):
     """
     Returns a df with information from comment thread including
     position (time), user, comment text, bid value, comment reputation, and whether or not the commenter is the seller.
@@ -71,7 +71,7 @@ def get_thread_df(driver):
     # get each element. could be comment, flagged comment, bid, etc.
     comments = thread.find_elements(By.XPATH, '*')
     # print user of each comment
-    thread_df = pd.DataFrame(columns = ['position', 'user', 'comment', 'bid', 'rep', 'seller'])
+    thread_df = pd.DataFrame(columns = ['id', 'position', 'user', 'comment', 'bid', 'rep', 'seller'])
     position = 1
     for comment in comments:
         # get username
@@ -102,12 +102,12 @@ def get_thread_df(driver):
         else:
             seller = 1
         
-        thread_df.loc[len(thread_df.index)] = [position, username, message, bid, rep, seller] 
+        thread_df.loc[len(thread_df.index)] = [id, position, username, message, bid, rep, seller] 
         position += 1    
     
     return thread_df
 
-def get_basic_df(driver):
+def get_basic_df(driver, id):
     """
     Returns a df with basic information about the auction such as:
     Title, subtitle, reserve, number of bids, number of comments, auction end date, nummber of photos
@@ -115,7 +115,7 @@ def get_basic_df(driver):
     body style, exterior color, interior color, seller type
     """
     ### INIT DF ###
-    df = pd.DataFrame(columns = ['title', 'subtitle', 'reserve', 'num_bids', 'num_com', 'end_bid', 'end_date', 'num_photos',
+    df = pd.DataFrame(columns = ['id', 'title', 'subtitle', 'reserve', 'num_bids', 'num_com', 'end_bid', 'end_date', 'num_photos',
                                 'make', 'model', 'milage', 'VIN', 'title', 'location', 'seller', 'engine', 'drivetrain', 'transmission',
                                 'body_style', 'e_color', 'i_color', 'seller_type'])
     
@@ -169,9 +169,34 @@ def get_basic_df(driver):
     i_color = quick_facts.find_element(By.XPATH, '//dl[2]/dd[6]').text
     seller_type = quick_facts.find_element(By.XPATH, '//dl[2]/dd[7]').text
 
-    df.loc[len(df.index)] = [auction_title, subtitle, reserve, num_bids, num_com, end_bid, end_date, num_photos, make, model, milage, vin, title, location, seller,
+    df.loc[len(df.index)] = [id, auction_title, subtitle, reserve, num_bids, num_com, end_bid, end_date, num_photos, make, model, milage, vin, title, location, seller,
                             engine, drivetrain, transmission, body_style, e_color, i_color, seller_type] 
 
+    return df
+
+def get_qanda_df(driver, id):
+
+    ### INIT DF ###
+    df = pd.DataFrame(columns = ['qid', 'question', 'q_author', 'verified', 'answer', 'a_author'])
+    if check_exists_by_class_name(driver, 'questions.empty'):
+        return df
+    questions = driver.find_elements(By.CLASS_NAME, 'qanda.answeed')
+    i = 1
+    for q in questions:
+        qid = id + '_' + str(i)
+        question = q.find_element(By.XPATH, '//div[1]/div[2]/div').text
+        q_author = q.find_element(By.XPATH, '//div[1]/div[1]/div[2]/a').text
+        try:
+            verified = q.find_element(By.CLASS_NAME, 'verified')
+        except:
+            verified = 0
+        else:
+            verified = 1
+        answer = q.find_element(By.XPATH, '//div[2]/div[2]/div').text
+        a_author = q.find_element(By.XPATH, '//div[2]/div[1]/div[2]/a').text
+        df.loc[len(df.index)] = [qid, question, q_author, verified, answer, a_author]
+        i += 1
+        
     return df
 
 def check_exists_by_class_name(driver, class_name):
@@ -198,6 +223,7 @@ def main():
             driver.find_element(By.XPATH, '//*[@id="root"]/div[3]/button/span').click()
         basic_df = pd.DataFrame() # initialize df
         for i in range(1, 51):
+            id = str(j)+'_'+str(i)
             xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
             try:
                 auction = WebDriverWait(driver, 5).until(
@@ -211,13 +237,20 @@ def main():
             action.move_to_element(auction).click().perform() # scroll to element and click
 
             load_and_scroll(driver) # scroll and load entire page
-            basic_df_i = get_basic_df(driver) # get basic df
+            basic_df_i = get_basic_df(driver, id) # get basic df
             if basic_df_i.empty:
                 driver.back()
             else:
                 basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
-                thread_df = get_thread_df(driver) # get comment thread
-                thread_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\thread_df\thread_df_' + str(j) + '_' + str(i) + '.csv') # save thread df
+
+                qanda_df = get_qanda_df(driver, id)
+                if qanda_df.empty:
+                    print('no qanda for ' + str(id))
+                else:
+                    qanda_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\qanda_df_' + str(id) + '.csv')
+
+                thread_df = get_thread_df(driver, id) # get comment thread
+                thread_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\thread_df\thread_df_' + str(id) + '.csv') # save thread df
                 driver.back() # back to auction listings
 
         basic_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\basic_df\basic_df_' + str(j) + '.csv') # save basic df
