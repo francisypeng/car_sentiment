@@ -8,6 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException  
 import time
 
 def load_and_scroll(driver):
@@ -120,7 +121,14 @@ def get_basic_df(driver):
     
     ### TITLE, SUBTITLE, RESERVE Y/N ###
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
-    auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
+    try:
+        auction_title_obj = WebDriverWait(auction_heading, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "auction-title"))
+        )
+    except:
+        print("Could not find auction-title, quitting.")
+        driver.quit()
+    #auction_title_obj = auction_heading.find_element(By.CLASS_NAME, 'auction-title') # get title
     auction_title = auction_title_obj.find_element(By.XPATH, '//h1').text
     subtitle = auction_heading.find_element(By.XPATH, '//div/div[2]/h2').text # get subtitle
     try: # get reserve 1 or 0
@@ -131,6 +139,9 @@ def get_basic_df(driver):
         reserve = 0
 
     ### BID STATS: # bids, # comments, $ final bid, end date ###
+    if check_exists_by_xpath(driver, '//*[@id="root"]/div[2]/div[3]/div[1]/div/div/ul/li[1]/span[2]'):
+        if driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[3]/div[1]/div/div/ul/li[1]/span[2]').text == 'Auction Cancelled':
+            return df
     bid_stats = driver.find_element(By.CLASS_NAME, 'bid-stats')
     num_bids = bid_stats.find_element(By.CLASS_NAME, 'num-bids').find_element(By.CLASS_NAME, 'value').text
     num_com = bid_stats.find_element(By.CLASS_NAME, 'num-comments').find_element(By.CLASS_NAME, 'value').text
@@ -163,12 +174,28 @@ def get_basic_df(driver):
 
     return df
 
+def check_exists_by_class_name(driver, class_name):
+    try:
+        driver.find_element(By.CLASS_NAME, class_name)
+    except NoSuchElementException:
+        return False
+    return True
+
+def check_exists_by_xpath(driver, xpath):
+    try:
+        driver.find_element(By.XPATH, xpath)
+    except NoSuchElementException:
+        return False
+    return True
 
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window() # maximize window for consistency
-    for j in range(1, 193):
+    for j in range(4, 193):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
+        time.sleep(2)
+        if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
+            driver.find_element(By.XPATH, '//*[@id="root"]/div[3]/button/span').click()
         basic_df = pd.DataFrame() # initialize df
         for i in range(1, 51):
             time.sleep(2)
@@ -180,12 +207,15 @@ def main():
 
             load_and_scroll(driver) # scroll and load entire page
             basic_df_i = get_basic_df(driver) # get basic df
-            basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
-            thread_df = get_thread_df(driver) # get comment thread
-            thread_df.to_csv('thread_df_' + str(i) + '.csv') # save thread df
-            driver.back() # back to auction listings
+            if basic_df_i.empty:
+                driver.back()
+            else:
+                basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
+                thread_df = get_thread_df(driver) # get comment thread
+                thread_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\thread_df\thread_df_' + str(j) + '_' + str(i) + '.csv') # save thread df
+                driver.back() # back to auction listings
 
-        basic_df.to_csv('basic_df_' + str(j) + '.csv') # save basic df
+        basic_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\basic_df\basic_df_' + str(j) + '.csv') # save basic df
 
     driver.quit() # quit driver
 
