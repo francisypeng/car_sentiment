@@ -25,7 +25,6 @@ def load_and_scroll(driver):
         lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
         if lastCount==lenOfPage:
             match=True
-    time.sleep(3)
 
     # find load more comments button and click
     eop = False
@@ -49,7 +48,6 @@ def load_and_scroll(driver):
                 lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
                 if lastCount==lenOfPage:
                     match=True
-            time.sleep(3)
     return None
 
 def get_thread_df(driver):
@@ -191,16 +189,21 @@ def check_exists_by_xpath(driver, xpath):
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window() # maximize window for consistency
-    for j in range(4, 193):
+    for j in range(10, 193):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
             driver.find_element(By.XPATH, '//*[@id="root"]/div[3]/button/span').click()
         basic_df = pd.DataFrame() # initialize df
         for i in range(1, 51):
-            time.sleep(2)
             xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
-            auction = driver.find_element(By.XPATH, xpath) # find auction element
+            try:
+                auction = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.XPATH, xpath)) # find auction
+                )
+            except:
+                print("Could not find auction from past auction page, quitting.")
+                driver.quit()
 
             action = ActionChains(driver) # initialize action chains driver for scroll to element and click
             action.move_to_element(auction).click().perform() # scroll to element and click
