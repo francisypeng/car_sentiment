@@ -71,7 +71,7 @@ def get_thread_df(driver, id):
     # get each element. could be comment, flagged comment, bid, etc.
     comments = thread.find_elements(By.XPATH, '*')
     # print user of each comment
-    thread_df = pd.DataFrame(columns = ['id', 'position', 'user', 'comment', 'bid', 'rep', 'seller'])
+    thread_df = pd.DataFrame(columns = ['position', 'user', 'comment', 'bid', 'upvote', 'rep', 'seller'])
     position = 1
     for comment in comments:
         # get username
@@ -101,8 +101,13 @@ def get_thread_df(driver, id):
             seller = 0
         else:
             seller = 1
+        # get upvote
+        try:
+            upvote = comment.find_element(By.CLASS_NAME, 'interact').text
+        except:
+            upvote = None
         
-        thread_df.loc[len(thread_df.index)] = [id, position, username, message, bid, rep, seller] 
+        thread_df.loc[len(thread_df.index)] = [position, username, message, bid, upvote, rep, seller] 
         position += 1    
     
     return thread_df
@@ -206,23 +211,123 @@ def get_qanda_df(driver, id):
     return df
 
 def get_details_df(driver, id):
+    detail_wrapper = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[5]/div[1]/div[3]')
 
-    detail_wrapper = driver.find_element(By.CLASS_NAME, 'detail-wrapper')
-    dtake = detail_wrapper.find_element(By.XPATH, '//div[1]/div[1]').text
-    highlights = detail_wrapper.find_elements(By.XPATH, '//div[2]/div/ul/li')
-    for 
-    equipment = detail_wrapper.find_element(By.XPATH, '//div[3]')
-    modifications = detail_wrapper.find_element(By.XPATH, '//div[4]')
-    known_flaws = detail_wrapper.find_element(By.XPATH, '//div[5]')
-    service_hist = detail_wrapper.find_element(By.XPATH, '//div[6]')
-    other_items = detail_wrapper.find_element(By.XPATH, '//div[7]')
-    ownership_hist = detail_wrapper.find_element(By.XPATH, '//div[8]')
-    seller_notes = detail_wrapper.find_element(By.XPATH, '//div[9]')
+    ### DOUGS TAKE ###
+    dtake_series = pd.Series()
+    try:
+        dtake = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section dougs-take']").text
+    except: 
+        dtake_series.loc[len(dtake_series.index)] = None
+        print('dtake not found')
+    else:
+        dtake_series.loc[len(dtake_series.index)] = dtake
+
+    ### HIGHLIGHTS ###
+    high_series = pd.Series()
+    try:
+        highlights = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-highlights']").find_elements(By.XPATH, './/div/ul/li')
+    except:
+        high_series.loc[len(high_series.index)] = None
+        print('highlights not found')
+    else:
+        print('HIGHLIGHT FOUND')
+        for highlight in highlights:
+            high_series.loc[len(high_series.index)] = highlight.text
+
+    ### EQUIPMENT ###
+    equip_series = pd.Series()
+    try: 
+        equipment = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-equipment']").find_elements(By.XPATH, './/div/ul/li')
+    except: 
+        equip_series.loc[len(equip_series.index)] = None
+        print('equipment not found')
+    else:
+        for equip in equipment:
+            equip_series.loc[len(equip_series.index)] = equip.text
+    
+    ### MODIFICATIONS ###
+    mod_series = pd.Series()
+    try:
+        modifications = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-modifications']").find_elements(By.XPATH, './/div/ul/li')
+    except: 
+        mod_series.loc[len(mod_series.index)] = None
+        print('modifications not found')
+    else: 
+        for mod in modifications:
+            mod_series.loc[len(mod_series.index)] = mod.text
+
+    ### KNOWN FLAWS ###
+    flaws_series = pd.Series()
+    try:
+        known_flaws = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-known_flaws']").find_elements(By.XPATH, './/div/ul/li')
+    except:
+        flaws_series.loc[len(flaws_series.index)] = None
+        print('known flaws not found')
+    else:
+        for flaw in known_flaws:
+            flaws_series.loc[len(flaws_series.index)] = flaw.text
+
+    ### SERVICE HISTORY ###
+    service_series = pd.Series()
+    try:
+        service_hist = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-recent_service_history']").find_elements(By.XPATH, './/div/ul/li')
+    except: 
+        service_series.loc[len(service_series.index)] = None
+        print('service history not found')
+    else:
+        for ser in service_hist:
+            service_series.loc[len(service_series.index)] = ser.text
+
+    ### OTHER ITEMS ###
+    other_series = pd.Series()
+    try: 
+        other_items = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-other_items']").find_elements(By.XPATH, './/div/ul/li')
+    except: 
+        other_series.loc[len(other_series.index)] = None
+        print('other items not found')
+    else:
+        for other in other_items:
+            other_series.loc[len(other_series.index)] = other.text
+
+    ### OWNERSHIP HISTORY ###
+    owner_series = pd.Series()
+    try:
+        ownership_hist = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-ownership_history']").find_element(By.XPATH, './/div/p').text
+    except:
+        owner_series.loc[len(owner_series.index)] = None
+        print('ownership history not found')
+    else:
+        owner_series.loc[len(owner_series.index)] = ownership_hist
+
+    ### SELLER NOTES ###
+    notes_series = pd.Series()
+    try:
+        seller_notes = detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-seller_notes']").find_elements(By.XPATH, './/div/ul/li')
+    except:
+        notes_series.loc[len(notes_series)] = None
+        print('seller notes not found')
+    else:
+        for notes in seller_notes:
+            notes_series.loc[len(notes_series)] = notes.text
+
+    ### VIDEOS ###
+    videos_series = pd.Series()
+    try:
+        videos = len(detail_wrapper.find_element(By.CSS_SELECTOR, "div[class = 'detail-section detail-videos']").find_elements(By.XPATH, './/div[1]/div'))
+    except:
+        videos_series.loc[len(notes_series)] = None
+        print('videos not found')
+    else:
+        videos_series.loc[0] = videos
 
 
+    detail_df = pd.concat([dtake_series, high_series, equip_series, mod_series, flaws_series, service_series, other_series, owner_series, notes_series, videos_series],  
+            axis = 1)
 
-    #//div[1]
-    return None
+    detail_df.columns = ['dtake', 'highlights', 'equipment', 'modifications', 'known_flaws', 'service_history', 'other_items', 'owner_history', 'seller_notes', 'num_videos']
+    
+    return detail_df
 
 def check_exists_by_class_name(driver, class_name):
     try:
@@ -241,14 +346,20 @@ def check_exists_by_xpath(driver, xpath):
 def main():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())) # create driver
     driver.maximize_window() # maximize window for consistency
-    for j in range(10, 193):
+
+    ### BEGIN TRAVERSING PAST AUCTION PAGES ###
+    for j in range(1, 215):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
             driver.find_element(By.XPATH, '//*[@id="root"]/div[3]/button/span').click()
-        basic_df = pd.DataFrame() # initialize df
-        for i in range(5, 51):
-            id = str(j)+'_'+str(i)
+
+        ### INIT BASIC DF ###
+        basic_df = pd.DataFrame() 
+
+        ### BEGIN TRAVERSING PAST AUCION PAGE ###
+        for i in range(1, 51):
+            id = str(j)+'_'+str(i) # define id
             time.sleep(2)
             xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
             try:
@@ -262,20 +373,23 @@ def main():
             action = ActionChains(driver) # initialize action chains driver for scroll to element and click
             action.move_to_element(auction).click().perform() # scroll to element and click
 
+            ### INSIDE AUCTION PAGE ###
             load_and_scroll(driver) # scroll and load entire page
+            print('Working id: = ' + str(id))
             basic_df_i = get_basic_df(driver, id) # get basic df
             if basic_df_i.empty:
                 driver.back()
             else:
                 basic_df = pd.concat([basic_df, basic_df_i], ignore_index=True) # concat basic df
 
-                qanda_df = get_qanda_df(driver, id)
-                if qanda_df.empty:
+                qanda_df = get_qanda_df(driver, id) # get q and a
+                if qanda_df.empty: # if no q and a move on
                     print('no qanda for ' + str(id))
                 else:
-                    qanda_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\qanda_df\qanda_df_' + str(id) + '.csv')
+                    qanda_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\qanda_df\qanda_df_' + str(id) + '.csv') # save q and a df
                 
-                details_df = get_details_df(driver, id)
+                details_df = get_details_df(driver, id) # get details
+                details_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\details_df\details_df' + str(id) + '.csv')
                 thread_df = get_thread_df(driver, id) # get comment thread
                 thread_df.to_csv(r'C:\Users\franc\Documents\THESIS\scrape_cab\thread_df\thread_df_' + str(id) + '.csv') # save thread df
                 driver.back() # back to auction listings
