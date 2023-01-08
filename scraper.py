@@ -195,16 +195,16 @@ def get_qanda_df(driver, id):
     i = 1
     for q in questions:
         qid = id + '_' + str(i)
-        question = q.find_element(By.XPATH, '//div[1]/div[2]/div').text
-        q_author = q.find_element(By.XPATH, '//div[1]/div[1]/div[2]/a').text
+        question = q.find_element(By.XPATH, './/div[1]/div[2]/div').text
+        q_author = q.find_element(By.XPATH, './/div[1]/div[1]/div[2]/a').text
         try:
             verified = q.find_element(By.CLASS_NAME, 'verified')
         except:
             verified = 0
         else:
             verified = 1
-        answer = q.find_element(By.XPATH, '//div[2]/div[2]/div').text
-        a_author = q.find_element(By.XPATH, '//div[2]/div[1]/div[2]/a').text
+        answer = q.find_element(By.XPATH, './/div[2]/div[2]/div').text
+        a_author = q.find_element(By.XPATH, './/div[2]/div[1]/div[2]/a').text
         df.loc[len(df.index)] = [qid, question, q_author, verified, answer, a_author]
         i += 1
         
