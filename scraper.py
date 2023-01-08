@@ -71,7 +71,7 @@ def get_thread_df(driver, id):
     # get each element. could be comment, flagged comment, bid, etc.
     comments = thread.find_elements(By.XPATH, '*')
     # print user of each comment
-    thread_df = pd.DataFrame(columns = ['position', 'user', 'comment', 'bid', 'upvote', 'rep', 'seller'])
+    thread_df = pd.DataFrame(columns = ['position', 'user', 'comment', 'bid', 'upvote', 'rep', 'seller', 'bidder', 'verified'])
     position = 1
     for comment in comments:
         # get username
@@ -106,8 +106,24 @@ def get_thread_df(driver, id):
             upvote = comment.find_element(By.CLASS_NAME, 'interact').text
         except:
             upvote = None
+
+        # get verified
+        try: 
+            get_verified = comment.find_element(By.CLASS_NAME, 'verified')
+        except:
+            verified = 0
+        else:
+            verified = 1
+
+        # get bidder
+        try:
+            get_bidder = comment.find_element(By.CLASS_NAME, 'bidder')
+        except:
+            bidder =  0
+        else:
+            bidder = 1
         
-        thread_df.loc[len(thread_df.index)] = [position, username, message, bid, upvote, rep, seller] 
+        thread_df.loc[len(thread_df.index)] = [position, username, message, bid, upvote, rep, seller, bidder, verified] 
         position += 1    
     
     return thread_df
