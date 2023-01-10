@@ -8,7 +8,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException  
+from selenium.common.exceptions import NoSuchElementException
+
 import time
 
 #test commit 3
@@ -143,12 +144,18 @@ def get_basic_df(driver, id):
     ### NUMBER OF VIEWS ###
                                              #//*[@id="root"]/div[2]/div[5]/div[1]/div[6]/div/ul/li[4]/div[2]
     try:
-        num_views = WebDriverWait(driver, 10).until(
+        num_views = WebDriverWait(driver, 1).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
         )
     except:
-        print("Could not find views icon, quitting.")
-        driver.quit()
+        driver.refresh()
+        try:
+            num_views = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
+            )
+        except:
+            print("views icon not found after refresh, quitting")
+            driver.quit()
 
     ### TITLE, SUBTITLE, RESERVE Y/N ###
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
@@ -370,7 +377,7 @@ def main():
     driver.maximize_window() # maximize window for consistency
 
     ### BEGIN TRAVERSING PAST AUCTION PAGES ###
-    for j in range(77, 215):
+    for j in range(80, 215):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
