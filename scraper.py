@@ -141,7 +141,14 @@ def get_basic_df(driver, id):
                                 'body_style', 'e_color', 'i_color', 'seller_type'])
     
     ### NUMBER OF VIEWS ###
-    num_views = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[5]/div[1]/div[6]/div/ul/li[4]/div[2]').text
+                                             #//*[@id="root"]/div[2]/div[5]/div[1]/div[6]/div/ul/li[4]/div[2]
+    try:
+        num_views = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
+        )
+    except:
+        print("Could not find views icon, quitting.")
+        driver.quit()
 
     ### TITLE, SUBTITLE, RESERVE Y/N ###
     auction_heading = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[1]')
@@ -247,7 +254,6 @@ def get_details_df(driver, id):
         high_series.loc[len(high_series.index)] = None
         print('highlights not found')
     else:
-        print('HIGHLIGHT FOUND')
         for highlight in highlights:
             high_series.loc[len(high_series.index)] = highlight.text
 
@@ -364,7 +370,7 @@ def main():
     driver.maximize_window() # maximize window for consistency
 
     ### BEGIN TRAVERSING PAST AUCTION PAGES ###
-    for j in range(1, 215):
+    for j in range(77, 215):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
