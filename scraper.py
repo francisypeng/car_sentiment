@@ -146,13 +146,13 @@ def get_basic_df(driver, id):
     try:
         num_views = WebDriverWait(driver, 1).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
-        )
+        ).text
     except:
         driver.refresh()
         try:
             num_views = WebDriverWait(driver, 5).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
-            )
+            ).text
         except:
             print("views icon not found after refresh, quitting")
             driver.quit()
@@ -377,7 +377,7 @@ def main():
     driver.maximize_window() # maximize window for consistency
 
     ### BEGIN TRAVERSING PAST AUCTION PAGES ###
-    for j in range(80, 215):
+    for j in range(77, 215):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
