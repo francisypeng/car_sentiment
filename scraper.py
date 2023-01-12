@@ -407,14 +407,23 @@ def main():
 
             action = ActionChains(driver) # initialize action chains driver for scroll to element and click
             action.move_to_element(auction).click().perform() # scroll to element and click
-            # Wait for page to load
+            
+            ### Wait for page to load
             try:
                 wait_for_load = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "div[class = 'detail-section dougs-take']")) # find dtake as signal of page loading
                 )
             except:
-                print("waited 10 seconds for page to load, quitting")
-                driver.quit()
+                print("### Waited 10 seconds for page to load, re-clicking for second try.")
+                action.move_to_element(auction).click().perform()
+                try:
+                    wait_for_load = WebDriverWait(driver, 10).until(
+                       EC.presence_of_element_located((By.CSS_SELECTOR, "div[class = 'detail-section dougs-take']")) # find dtake as signal of page loading
+                    )
+                except:
+                    print("Waited another 10 seconds for page to load, quitting.")
+                    driver.quit()
+            ###
 
             ### INSIDE AUCTION PAGE ###
             load_and_scroll(driver) # scroll and load entire page
