@@ -383,7 +383,7 @@ def main():
     driver.maximize_window() # maximize window for consistency
 
     ### BEGIN TRAVERSING PAST AUCTION PAGES ###
-    for j in range(90, 215):
+    for j in range(127, 215):
         driver.get('https://carsandbids.com/past-auctions/?page=' + str(j)) # auction listings
         time.sleep(2)
         if check_exists_by_xpath(driver, '//*[@id="root"]/div[3]/button/span'):
@@ -407,6 +407,14 @@ def main():
 
             action = ActionChains(driver) # initialize action chains driver for scroll to element and click
             action.move_to_element(auction).click().perform() # scroll to element and click
+            # Wait for page to load
+            try:
+                wait_for_load = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "div[class = 'detail-section dougs-take']")) # find dtake as signal of page loading
+                )
+            except:
+                print("waited 10 seconds for page to load, quitting")
+                driver.quit()
 
             ### INSIDE AUCTION PAGE ###
             load_and_scroll(driver) # scroll and load entire page
