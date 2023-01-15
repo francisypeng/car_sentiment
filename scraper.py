@@ -143,6 +143,10 @@ def get_basic_df(driver, id):
     
     ### NUMBER OF VIEWS ###
                                              #//*[@id="root"]/div[2]/div[5]/div[1]/div[6]/div/ul/li[4]/div[2]
+    numid = int(id.replace('_', ''))
+    
+    
+        
     try:
         num_views = WebDriverWait(driver, 1).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'td.views-icon'))
@@ -393,7 +397,7 @@ def main():
         basic_df = pd.DataFrame() 
 
         ### BEGIN TRAVERSING PAST AUCION PAGE ###
-        for i in range(1, 51):
+        for i in range(1, 32):
             id = str(j)+'_'+str(i) # define id
             time.sleep(2)
             xpath = '//*[@id="root"]/div[2]/div[2]/div/ul[1]/li[' + str(i) + ']/div[2]/div/a' # auction element xpath
