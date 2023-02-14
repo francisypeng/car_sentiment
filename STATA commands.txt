@@ -1,0 +1,1 @@
+dsregress end_bid reserve num_bids num_com milage private_seller num_highlights num_equipment num_modifications num_known_flaws num_service_history num_other_items num_owner_history num_videos sentiment_score title_status num_views num_photos, controls(year make_amgeneral-icolor_yellow)
