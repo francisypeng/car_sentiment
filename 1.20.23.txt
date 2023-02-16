@@ -27,8 +27,11 @@ now think why?
 
 think of all possible stories and defend
 
-sentiment is a reflectio nof extra information bidders/commenters have?
+sentiment is a reflection of extra information bidders/commenters have?
 	look more closely at the comment thread
+
+	look at bids directly following a positive and high impact comment
+		-assume that upvotes represents facts and not fluff
 
 sentiment makes people bid high?
 	

@@ -1,0 +1,34 @@
+- what affects sentiment score?
+	- if it depends on the other variables then it doesn't represent any additional information
+	- what if sentiment score is a function of something?
+		- only look at certain comments
+
+- try all the different methods, correlation coefficient?
+	- different 
+
+
+- how to evaluate model performance
+	- we want to know what is going on?
+	- the sentiment scores are not very closely correlated, how to know which one is the best?
+
+	- check correlation between bert and roberta
+		- if they are the same then it doesn't really matter, results are robust to the choice of algorithm
+		- if they are different, why?
+		- what is the crucial difference between the two
+
+- does sentiment score affect the number of bidders?
+	- few bidders but they bid more frequently?
+	- get the number of bidders
+
+TODO
+- check number of bidders
+- BERT vs roBERTa
+	- correlation, regression with number of bids, normalize
+
+- set sentiment score as y, is it predictable? (don't include price) (include number of bids or number of bidders)
+
+- for literature: sentiment and economics
+- where has sentiment score been used empirically
+	- where does it matter?
+	- what kind of papers can we talk about that have used sentiment
+			
