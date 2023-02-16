@@ -16,8 +16,8 @@ def mark_relevant(dfi):
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 sentiment_pipeline = pipeline("sentiment-analysis", truncation = True)
-model = pipeline(model="nlptown/bert-base-multilingual-uncased-sentiment", truncation = True, device=0)
-#model = pipeline(model="cardiffnlp/twitter-roberta-base-sentiment-latest")
+#model = pipeline(model="nlptown/bert-base-multilingual-uncased-sentiment", truncation = True, device=0)
+model = pipeline(model="cardiffnlp/twitter-roberta-base-sentiment-latest", device = 0, max_length=512)
 
 all_files = glob.glob(os.path.join('thread_df', '*.csv'))
 
@@ -28,11 +28,13 @@ for file in all_files:
     comments = df.dropna(subset = ['comment']).reset_index(drop=True)
     ds = model(comments['comment'].tolist(), truncation = True)
     #comments.loc[:,'sentiment_score'] = comments['comment'].apply(get_sentiment_score)
-    scores = pd.DataFrame(ds)['label'].str.extract('(\d+)').astype(int)
-    comments = comments.join(scores).rename(columns={0:'sentiment_score'})
+    #scores = pd.DataFrame(ds)['label'].str.extract('(\d+)').astype(int)
+    scores = pd.DataFrame(ds)['label'].apply(lambda x: 1 if x == 'positive' else (0 if x == 'neutral' else -1))
+    #comments = comments.join(scores).rename(columns={0:'sentiment_score'})
+    comments = comments.join(scores).rename(columns={'label':'sentiment_score'})
     test = mark_relevant(comments)
     relevant_comments = test[test['relevant'] == True].iloc[1:]
     final_sentiment = relevant_comments.sentiment_score.sum()/len(relevant_comments)
     df_out.loc[len(df_out.index)] = [id, final_sentiment]
 
-df_out.to_csv('thread_sentiment_bert.csv')
+df_out.to_csv('thread_sentiment_roberta.csv')
