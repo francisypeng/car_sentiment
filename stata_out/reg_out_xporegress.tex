@@ -1,0 +1,42 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{2}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}         &\multicolumn{1}{c}{(2)}         \\
+\hline
+Sentiment score     &    4255.168\sym{**} &    3616.194\sym{**} \\
+                    &  (1749.045)         &  (1787.226)         \\
+[1em]
+Reserve             &    1921.804\sym{***}&    2329.208\sym{***}\\
+                    &   (424.864)         &   (425.136)         \\
+[1em]
+Number bids         &     207.204\sym{***}&     209.335\sym{***}\\
+                    &    (29.552)         &    (29.763)         \\
+[1em]
+Number bidders      &    -696.276\sym{***}&    -718.465\sym{***}\\
+                    &    (76.925)         &    (77.680)         \\
+[1em]
+Number comments     &      19.576         &       6.134         \\
+                    &    (15.614)         &    (15.609)         \\
+[1em]
+Milage              &      -0.102\sym{***}&      -0.103\sym{***}\\
+                    &     (0.005)         &     (0.005)         \\
+[1em]
+Number modifications&     -40.147         &     -25.524         \\
+                    &    (28.792)         &    (28.738)         \\
+[1em]
+Number known flaws  &    -997.744\sym{***}&   -1022.774\sym{***}\\
+                    &    (65.139)         &    (65.740)         \\
+[1em]
+Number videos       &    -175.589\sym{*}  &    -180.873\sym{**} \\
+                    &    (91.345)         &    (91.516)         \\
+[1em]
+Number photos       &      12.868\sym{***}&      11.778\sym{**} \\
+                    &     (4.813)         &     (4.845)         \\
+\hline
+Observations        &        6942         &        6942         \\
+\hline\hline
+\multicolumn{3}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{3}{l}{\footnotesize \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+}
