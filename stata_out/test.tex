@@ -1,0 +1,67 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{1}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}\\
+                    &\multicolumn{1}{c}{end\_bid}\\
+\hline
+sentiment\_score     &    7974.774\sym{***}\\
+                    &  (1477.966)         \\
+[1em]
+reserve             &    -570.584         \\
+                    &   (384.750)         \\
+[1em]
+num\_bids            &     201.178\sym{***}\\
+                    &    (21.526)         \\
+[1em]
+num\_bidders         &    -761.066\sym{***}\\
+                    &    (60.347)         \\
+[1em]
+num\_com             &      33.790\sym{***}\\
+                    &    (12.767)         \\
+[1em]
+milage              &      -0.105\sym{***}\\
+                    &     (0.005)         \\
+[1em]
+private\_seller      &     595.359         \\
+                    &   (475.137)         \\
+[1em]
+num\_highlights      &    -173.457         \\
+                    &   (253.795)         \\
+[1em]
+num\_equipment       &     573.786\sym{***}\\
+                    &    (75.430)         \\
+[1em]
+num\_modifications   &      19.964         \\
+                    &    (24.993)         \\
+[1em]
+num\_known\_flaws     &    -785.702\sym{***}\\
+                    &    (54.896)         \\
+[1em]
+num\_service\_history &    -288.148\sym{***}\\
+                    &    (41.845)         \\
+[1em]
+num\_other\_items     &     182.801\sym{**} \\
+                    &    (76.540)         \\
+[1em]
+num\_owner\_history   &   -2841.467         \\
+                    &  (2263.115)         \\
+[1em]
+num\_videos          &    -111.622         \\
+                    &    (73.673)         \\
+[1em]
+title\_status        &    1475.242         \\
+                    &  (1798.493)         \\
+[1em]
+num\_views           &       1.083\sym{***}\\
+                    &     (0.103)         \\
+[1em]
+num\_photos          &       8.167\sym{**} \\
+                    &     (3.890)         \\
+\hline
+Observations        &        6942         \\
+\hline\hline
+\multicolumn{2}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+}
