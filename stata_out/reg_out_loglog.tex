@@ -1,0 +1,44 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{1}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}\\
+                    &\multicolumn{1}{c}{ln(Price)}\\
+\hline
+ln(Sentiment score) &       0.199\sym{***}\\
+                    &     (0.019)         \\
+[1em]
+Reserve             &       0.170\sym{***}\\
+                    &     (0.010)         \\
+[1em]
+Number bids         &       0.007\sym{***}\\
+                    &     (0.000)         \\
+[1em]
+Number bidders      &      -0.013\sym{***}\\
+                    &     (0.001)         \\
+[1em]
+Number comments     &       0.000         \\
+                    &     (0.000)         \\
+[1em]
+Milage              &      -0.000\sym{***}\\
+                    &     (0.000)         \\
+[1em]
+Number modifications&       0.004\sym{***}\\
+                    &     (0.001)         \\
+[1em]
+Number known flaws  &      -0.026\sym{***}\\
+                    &     (0.001)         \\
+[1em]
+Number views        &       0.000\sym{***}\\
+                    &     (0.000)         \\
+[1em]
+Number photos       &       0.000\sym{***}\\
+                    &     (0.000)         \\
+\hline
+R-squared           &       0.874         \\
+Observations        &        6941         \\
+\hline\hline
+\multicolumn{2}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+}

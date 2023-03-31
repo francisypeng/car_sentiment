@@ -1,0 +1,45 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{3}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+                    &\multicolumn{1}{c}{ln(Price)}&\multicolumn{1}{c}{ln(Price)}&\multicolumn{1}{c}{ln(Price)}\\
+\hline
+ln(Sentiment score) &       0.161\sym{***}&       0.137\sym{***}&       0.127\sym{***}\\
+                    &     (0.022)         &     (0.023)         &     (0.024)         \\
+[1em]
+Reserve             &       0.250\sym{***}&       0.275\sym{***}&       0.288\sym{***}\\
+                    &     (0.011)         &     (0.011)         &     (0.012)         \\
+[1em]
+Number bids         &       0.007\sym{***}&       0.007\sym{***}&       0.007\sym{***}\\
+                    &     (0.001)         &     (0.001)         &     (0.001)         \\
+[1em]
+Number bidders      &      -0.013\sym{***}&      -0.013\sym{***}&      -0.014\sym{***}\\
+                    &     (0.001)         &     (0.002)         &     (0.002)         \\
+[1em]
+Number comments     &      -0.000         &      -0.000         &      -0.000         \\
+                    &     (0.000)         &     (0.000)         &     (0.000)         \\
+[1em]
+Milage              &      -0.000\sym{***}&      -0.000\sym{***}&      -0.000\sym{***}\\
+                    &     (0.000)         &     (0.000)         &     (0.000)         \\
+[1em]
+Number modifications&       0.003\sym{***}&       0.002\sym{***}&       0.003\sym{***}\\
+                    &     (0.001)         &     (0.001)         &     (0.001)         \\
+[1em]
+Number known flaws  &      -0.030\sym{***}&      -0.031\sym{***}&      -0.033\sym{***}\\
+                    &     (0.002)         &     (0.002)         &     (0.002)         \\
+[1em]
+Number views        &       0.000\sym{***}&       0.000\sym{***}&       0.000\sym{***}\\
+                    &     (0.000)         &     (0.000)         &     (0.000)         \\
+[1em]
+Number photos       &       0.000\sym{***}&       0.001\sym{***}&       0.001\sym{***}\\
+                    &     (0.000)         &     (0.000)         &     (0.000)         \\
+\hline
+Observations        &        6941         &        6941         &        6941         \\
+Number potential controls&         289         &         289         &         289         \\
+Number controls selected&         162         &         162         &         171         \\
+\hline\hline
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+}
